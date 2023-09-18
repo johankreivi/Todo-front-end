@@ -1,9 +1,11 @@
 import { Layout, Col, message, Row, Tabs } from 'antd';
 import TodosForm from './TodosForm';
 import React, { useCallback, useEffect } from 'react';
-import { createTodo } from '../services/todoServices';
+import { createTodo, getTodos } from '../services/todoServices';
 import { on } from 'events';
 import { Todo } from './models/Todo';
+import TodoListTable from './TodoListTable';
+import { get } from 'http';
 
 const { TabPane } = Tabs;
 const { Content } = Layout;
@@ -16,6 +18,12 @@ const TodoList: React.FC = () => {
         await createTodo(todo);
         onRefresh();
         message.success('Todo created successfully!');
+    };
+
+    const handlePageChange = async (page: number, pageSize: number) => {
+        await getTodos(page, pageSize)
+
+
     };
 
     const onRefresh = useCallback(async () => {
@@ -37,11 +45,14 @@ const TodoList: React.FC = () => {
                     <br />
                     <Tabs defaultActiveKey="all">
                         <TabPane tab="All" key="all">
-                            </TabPane>
-                            <TabPane tab="In Progress" key="inProgress">
-                            </TabPane>
-                            <TabPane tab="Completed" key="completed">
-                            </TabPane>
+                            <TodoListTable todos={[]} onPaginate={handlePageChange} />
+                        </TabPane>
+                        <TabPane tab="In Progress" key="inProgress">
+                            In progress
+                        </TabPane>
+                        <TabPane tab="Completed" key="completed">
+                            Completed
+                        </TabPane>
                         </Tabs>
                     </Col>
                 </Row>
