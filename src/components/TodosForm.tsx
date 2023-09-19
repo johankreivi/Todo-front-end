@@ -14,6 +14,7 @@ const TodosForm: React.FC<TodosFormsProps> = (props) => {
             title: form.getFieldsValue().title,
             completed: false
         };
+        
         onFormSubmit(todo);
         form.resetFields();
     }
