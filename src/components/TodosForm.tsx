@@ -1,21 +1,26 @@
 import { Col, Form, Row, Input, Button } from 'antd';
 import React from 'react';
 import { Todo } from './models/Todo';
-import { TodosFormsProps } from './models/TodosFormsProps';
 import { PlusCircleFilled } from '@ant-design/icons';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch } from '../store';
+import { createNewTodo } from '../todoSlice';
+import { RootState } from '../store';
 
-const TodosForm: React.FC<TodosFormsProps> = (props) => {
-
+const TodosForm: React.FC = () => {
+    const dispatch: AppDispatch = useDispatch();
+    const { currentPage, defaultPageSize } = useSelector((state: RootState) => state.todos);
     const [form] = Form.useForm();
-    const { onFormSubmit } = props;
 
     const onFinish = () => {
+        console.log('Success:' + form.getFieldsValue().title);
         const todo: Todo = {
             title: form.getFieldsValue().title,
             completed: false
         };
         
-        onFormSubmit(todo);
+        dispatch(createNewTodo({ todo, page: currentPage, pageSize: defaultPageSize }));
+
         form.resetFields();
     }
 

@@ -1,38 +1,27 @@
-import { Layout, Col, message, Row, Tabs } from 'antd';
+import { Layout, Col, Row, Tabs } from 'antd';
 import TodosForm from './TodosForm';
-import React, { useCallback, useEffect } from 'react';
-import { createTodo, getTodos } from '../services/todoServices';
-import { on } from 'events';
-import { Todo } from './models/Todo';
-import TodoListTable from './TodoListTable';
-import { get } from 'http';
+import React, { useEffect } from 'react';
+import TodoListTable from  './TodoListTable';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchTodos, setCurrentPage, setDefaultPageSize,  } from '../todoSlice'; // Adjust the import to your file structure
+import { RootState, AppDispatch } from "../store";
 
 const { TabPane } = Tabs;
 const { Content } = Layout;
 
 const TodoList: React.FC = () => {
-
-    const [refresh, setRefresh] = React.useState(false);
-
-    const handleCreate = async (todo: Todo) => {
-        await createTodo(todo);
-        onRefresh();
-        message.success('Todo created successfully!');
+    const dispatch: AppDispatch = useDispatch();
+    const { currentPage, defaultPageSize } = useSelector((state: RootState) => state.todos);
+  
+    const handlePageChange = (page: number, pageSize: number) => {
+      dispatch(setCurrentPage(page));
+      dispatch(setDefaultPageSize(pageSize));
+      dispatch(fetchTodos({ page, pageSize }));
     };
-
-    const handlePageChange = async (page: number, pageSize: number) => {
-        await getTodos(page, pageSize)
-
-
-    };
-
-    const onRefresh = useCallback(async () => {
-        setRefresh(true);
-        setRefresh(false);
-    }, [refresh]);
-
+  
     useEffect(() => {
-    }, [onRefresh]);
+      dispatch(fetchTodos({ page: currentPage, pageSize: defaultPageSize }));
+    }, [dispatch, currentPage, defaultPageSize]);
 
     return (
 <Layout className="layout">
@@ -41,11 +30,11 @@ const TodoList: React.FC = () => {
             <Row>
                 <Col span={12} offset={6}>
                     <h1>Todo List</h1>
-                    <TodosForm onFormSubmit={handleCreate} />
+                    <TodosForm />
                     <br />
                     <Tabs defaultActiveKey="all">
                         <TabPane tab="All" key="all">
-                            <TodoListTable todos={[]} onPaginate={handlePageChange} />
+                            <TodoListTable />
                         </TabPane>
                         <TabPane tab="In Progress" key="inProgress">
                             In progress
