@@ -1,12 +1,14 @@
 import React from "react";
 import { Table } from "antd";
 import { useDispatch, useSelector } from "react-redux";
-import { setCurrentPage, setDefaultPageSize } from "../todoSlice";
+import { setCurrentPage, setDefaultPageSize, changeTodoStatus} from "../todoSlice";
 import { RootState, AppDispatch } from "../store";
+import { Todo } from "./models/Todo";
+import e from "express";
 
 const TodoListTable: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
-  const { data, totalItems, defaultPageSize, loading } = useSelector((state: RootState) => state.todos);
+  const { data, totalItems, defaultPageSize, loading, currentPage } = useSelector((state: RootState) => state.todos);
 
   const columns = [
     {
@@ -22,17 +24,31 @@ const TodoListTable: React.FC = () => {
         render: (text: string) => <a>{text}</a>,
     },
     {
-        title: 'Actions',
+        title: 'Completed',
         dataIndex: 'completed',
         key: 'completed',
-        render: (text: boolean) => (
+        render: (text: boolean, record: Todo) => (
         <div className="completed">
             <input 
             type="checkbox"
             checked={text}
-            onChange={() => {}}
+            //todo: Todo, page: number, pageSize: number
+            onChange={() => {
+              dispatch(changeTodoStatus({todo: {id: record.id, title : record.title, completed : !text}, page: currentPage, pageSize: defaultPageSize}
+              ));
+            }}
             />
         </div>
+        ),
+    },
+    {
+        title: 'Action',
+        key: 'action',
+        render: (text: string, record: Todo) => (
+        <span>
+            <a style={{ marginRight: 16 }}>Edit</a>
+            <a>Delete</a>
+        </span>
         ),
     },
 ];

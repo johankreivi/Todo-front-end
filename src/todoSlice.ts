@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import { getTodos, getTodoCount, createTodo } from "./services/todoServices";
+import { getTodos, getTodoCount, createTodo, flipTodoStatus } from "./services/todoServices";
 import { Todo } from "./components/models/Todo";
 import { message } from "antd";
 
@@ -41,7 +41,18 @@ export const createNewTodo = createAsyncThunk(
       return thunkAPI.rejectWithValue(error);
     }});
 
-
+export const changeTodoStatus = createAsyncThunk(
+  'todos/changeTodoStatus',
+  async (params: { todo: Todo, page: number, pageSize: number }, thunkAPI) => {
+    try {
+      const editedTodo = await flipTodoStatus(params.todo);
+      message.success('Todo status changed successfully!');
+      await thunkAPI.dispatch(fetchTodos({ page: params.page, pageSize: params.pageSize }));
+    } catch (error) {
+      message.error('Failed to change todo status.');
+      return thunkAPI.rejectWithValue(error);
+    }});
+    
 
 const todoSlice = createSlice({
   name: "todos",
@@ -53,6 +64,9 @@ const todoSlice = createSlice({
     setDefaultPageSize: (state, action: PayloadAction<number>) => {
       state.defaultPageSize = action.payload;
     },
+    createNewTodo: (state, action: PayloadAction<Todo>) => {
+      state.data.push(action.payload);
+    }
   },
   extraReducers: (builder) => {
     builder
