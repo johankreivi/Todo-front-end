@@ -1,7 +1,7 @@
 import React from "react";
 import {  Form, Input, InputNumber, Popconfirm, Table, Typography } from "antd";
 import { useDispatch, useSelector } from "react-redux";
-import { saveData, setCurrentPage, setDefaultPageSize, changeTodoStatus} from "../todoSlice";
+import { saveData, setCurrentPage, setDefaultPageSize, changeTodoStatus, deleteData} from "../todoSlice";
 import { setEditingKey } from "../tableSlice";
 import { RootState, AppDispatch } from "../store";
 import { Todo } from "./models/Todo";
@@ -22,6 +22,11 @@ const TodoListTable: React.FC = () => {
 
     dispatch(setEditingKey(record.id));
   };
+
+  const deleteTodo = async (record : Todo) => {
+    dispatch(deleteData({data : record, page: currentPage, pageSize: defaultPageSize}));
+  };
+
 
   const cancel = () => {
     dispatch(setEditingKey(-1));
@@ -94,9 +99,14 @@ const TodoListTable: React.FC = () => {
               </Popconfirm>
             </span>
           ) : (
-            <Typography.Link disabled={editingKey !== -1} onClick={() => edit(record)}>
-            Edit
-          </Typography.Link>
+            <>
+              <Typography.Link disabled={editingKey !== -1} onClick={() => edit(record)}>
+              Edit
+              </Typography.Link>
+              <Typography.Link disabled={editingKey !== -1} onClick={() => deleteTodo(record)}>
+              Delete
+              </Typography.Link>
+            </>
           );
         },
     },

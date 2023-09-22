@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import { getTodos, getTodoCount, createTodo, flipTodoStatus, editTodo } from "./services/todoServices";
+import { getTodos, getTodoCount, createTodo, flipTodoStatus, editTodo, deleteTodoById } from "./services/todoServices";
 import { Todo } from "./components/models/Todo";
 import { message } from "antd";
 
@@ -34,6 +34,18 @@ export const saveData = createAsyncThunk('todos/saveData', async (params: { data
     await thunkAPI.dispatch(fetchTodos({ page: params.page, pageSize: params.pageSize}));
   } catch (error) {
     message.error('Failed to save data.');
+    return thunkAPI.rejectWithValue(error);
+  }
+});
+
+export const deleteData = createAsyncThunk('todos/deleteData', async (params: { data: Todo, page: number, pageSize : number }, thunkAPI) => {
+  try {
+    if (!params.data.id) return thunkAPI.rejectWithValue('Invalid data');
+    const promise = await deleteTodoById(params.data.id);
+    message.success('Data deleted successfully!');
+    await thunkAPI.dispatch(fetchTodos({ page: params.page, pageSize: params.pageSize}));
+  } catch (error) {
+    message.error('Failed to delete data.');
     return thunkAPI.rejectWithValue(error);
   }
 });
