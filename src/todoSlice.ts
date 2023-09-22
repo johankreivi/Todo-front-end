@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import { getTodos, getTodoCount, createTodo, flipTodoStatus } from "./services/todoServices";
+import { getTodos, getTodoCount, createTodo, flipTodoStatus, editTodo } from "./services/todoServices";
 import { Todo } from "./components/models/Todo";
 import { message } from "antd";
 
@@ -25,6 +25,17 @@ export const fetchTodos = createAsyncThunk('todos/fetchTodos', async (params: { 
   const data = await getTodos(params.page, params.pageSize);
   const totalItems = await getTodoCount();
   return { data, totalItems };
+});
+
+export const saveData = createAsyncThunk('todos/saveData', async (params: { data: Todo, page: number, pageSize : number }, thunkAPI) => {
+  try {
+    const data = await editTodo(params.data);
+    message.success('Data saved successfully!');
+    await thunkAPI.dispatch(fetchTodos({ page: params.page, pageSize: params.pageSize}));
+  } catch (error) {
+    message.error('Failed to save data.');
+    return thunkAPI.rejectWithValue(error);
+  }
 });
 
 export const createNewTodo = createAsyncThunk(
@@ -80,8 +91,18 @@ const todoSlice = createSlice({
       })
       .addCase(fetchTodos.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || 'Something went wrong';
-      });
+        state.error = action.error.message || 'Something went wrong while fetching data';
+      })
+      .addCase(saveData.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(saveData.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(saveData.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || 'Something went wrong while saving data';
+      })
   },
 });
 
