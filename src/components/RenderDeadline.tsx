@@ -27,11 +27,11 @@ const editable = isEditing({id: record.id});
         ) : (
           <div className="deadline">
             <Row>
-              {record.deadline !== null ? dayjs(record.deadline).utc(true).format("YYYY-MM-DD HH:mm") : "ingen deadline"}
+              {record.deadline !== null ? dayjs(record.deadline).utc(true).format("YYYY-MM-DD HH:mm") : " "}
             </Row>
             <Row>
               <Typography.Text type="secondary">
-              <DeadlineCountdown deadline={dayjs(record.deadline).utc(true).format("YYYY-MM-DD HH:mm")} />
+              <DeadlineCountdown deadline={record.deadline !== null ? dayjs(record.deadline).utc(true).format("YYYY-MM-DD HH:mm") : null} />
               </Typography.Text>
             </Row>
           </div>

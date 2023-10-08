@@ -9,7 +9,9 @@ const DeadlineCountdown: React.FC<Props> = ({ deadline }) => {
     if (!deadline) {
         return (
             <>
-            "null va de här"
+                <span style={{color: "#ff4d4f"}}>
+                    No deadline set
+                </span>
             </>
             );
     }
