@@ -1,20 +1,24 @@
 import React from "react";
-import {  Form, Input, InputNumber, Popconfirm, Table, Typography } from "antd";
+import {  Form, Table, Col } from "antd";
 import { useDispatch, useSelector } from "react-redux";
-import { saveData, setCurrentPage, setDefaultPageSize, changeTodoStatus, deleteData} from "../todoSlice";
+import { saveData, setCurrentPage, setDefaultPageSize, deleteData} from "../todoSlice";
 import { setEditingKey } from "../tableSlice";
 import { RootState, AppDispatch } from "../store";
 import { Todo } from "./models/Todo";
 import EditableCell from "./EditableCell";
+import RenderTitle from "./RenderTitle";
+import RenderCompleted from "./RenderCompleted";
+import RenderDeadline from "./RenderDeadline";
+import RenderAction from "./RenderAction";
 
 const TodoListTable: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
   const { data, totalItems, defaultPageSize, loading, currentPage } = useSelector((state: RootState) => state.todos);
+
   const editingKey = useSelector((state: RootState) => state.table.editingKey);
   const [form] = Form.useForm();
 
-  const isEditing = (record: { id: number }) => record.id === editingKey;
-  console.log(editingKey);
+  const isEditing = (record: {id?: number | undefined }) => record.id === editingKey;
   const edit = (record: any) => {
     form.setFieldsValue({
       ...record
@@ -34,10 +38,8 @@ const TodoListTable: React.FC = () => {
 
   const save = async (record : Todo) => {
     try {
-      console.log(form.getFieldsValue().title);
       await form.validateFields();
-      const newData : Todo = {id : record.id, title: form.getFieldsValue().title, completed : record.completed};
-      console.log(newData);
+      const newData : Todo = {id : record.id, title: form.getFieldsValue().title, completed : record.completed, deadline: record.deadline};
       await dispatch(saveData({data : newData, page: currentPage, pageSize: defaultPageSize}));
       dispatch(setEditingKey(-1));
       }
@@ -45,8 +47,6 @@ const TodoListTable: React.FC = () => {
       console.log('Validate Failed:', errInfo);
     }
   };
-
-
 
   const columns = [
     {
@@ -59,57 +59,27 @@ const TodoListTable: React.FC = () => {
         title: 'Title',
         dataIndex: 'title',
         key: 'title',
-        render: (text: string) => <a>{text}</a>,
+        render: (text: string) => <RenderTitle text={text} />,
         editable: true,
     },
     {
-        title: 'Completed',
+        title: 'Done',
         dataIndex: 'completed',
         key: 'completed',
-        render: (text: boolean, record: Todo) => (
-        <div className="completed">
-            <input 
-            type="checkbox"
-            checked={text}
-            onChange={() => {
-              dispatch(changeTodoStatus({todo: {id: record.id, title : record.title, completed : !text}, page: currentPage, pageSize: defaultPageSize}
-              ));
-            }}
-            />
-        </div>
-        ),
+        render: (text: boolean, record: Todo) => <RenderCompleted text={text} record={record} dispatch={dispatch} isEditing={isEditing} />,
+        
     },
     {
-        title: 'Action',
-        key: 'action',
-        render: (_ : any, record : any) => {
-          const editable = isEditing(record);
-          return editable ? (
-            <span>
-              <Typography.Link
-                onClick={() => save(record)}
-                style={{
-                  marginRight: 8,
-                }}
-              >
-                Save
-              </Typography.Link>
-              <Popconfirm title="Sure to cancel?" onConfirm={cancel}>
-                <a>Cancel</a>
-              </Popconfirm>
-            </span>
-          ) : (
-            <>
-              <Typography.Link disabled={editingKey !== -1} onClick={() => edit(record)}>
-              Edit
-              </Typography.Link>
-              <Typography.Link disabled={editingKey !== -1} onClick={() => deleteTodo(record)}>
-              Delete
-              </Typography.Link>
-            </>
-          );
-        },
-    },
+      title: 'Deadline',
+      dataIndex: 'deadline',
+      key: 'deadline',
+      render: (text: string, record: Todo) => <RenderDeadline text={text} record={record} dispatch={dispatch} isEditing={isEditing} />,
+  },
+  {
+    title: 'Action',
+    key: 'action',
+    render: (_: any, record: any) => <RenderAction record={record} isEditing={isEditing} edit={edit} deleteTodo={deleteTodo} save={save} cancel={cancel} editingKey={editingKey} />,
+},
 ];
 
 const mergedColumns = columns.map(col => {
@@ -129,7 +99,7 @@ const mergedColumns = columns.map(col => {
 });
 
   return (
-    <div style={{ padding: "20px" }}>
+    <Col >
       <h2>The list of all lists:</h2>
       <Form form={form} component={false}>
         <Table
@@ -162,7 +132,7 @@ const mergedColumns = columns.map(col => {
 
           </Table>
         </Form>
-    </div>
+    </Col>
   );
 };
 
