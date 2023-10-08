@@ -91,13 +91,8 @@ export const changeTodoStatus = createAsyncThunk(
   async (params: { todo: Todo }, thunkAPI) => {
     try {
       const state = (thunkAPI.getState() as RootState).todos;
-      console.log(state);
       const page = state.currentPage;
-      console.log(page);
       const pageSize = state.defaultPageSize;
-      console.log(pageSize);
-
-      console.log(params.todo);
       const editedTodo = await flipTodoStatus(params.todo);
 
       message.success('Todo status changed successfully!');

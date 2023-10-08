@@ -24,7 +24,7 @@ const editable = isEditing({id: record.id});
               type="checkbox"
               checked={text}
               onChange={() => {
-                dispatch(changeTodoStatus({todo: {id: record.id, title : record.title, completed : !text}}
+                dispatch(changeTodoStatus({todo: {id: record.id, title : record.title, completed : !text, deadline: record.deadline}}
                 ));
               }}
               />

@@ -25,7 +25,8 @@ export const flipTodoStatus = async (todo: Todo) => {
     return axios.put(`${baseUrl}`, {
         id: todo.id,
         title: todo.title,
-        completed: todo.completed
+        completed: todo.completed,
+        deadline: todo.deadline
     }).then(response => response.data);
 }
 
