@@ -3,10 +3,11 @@ import { Todo } from '../components/models/Todo';
 
 const baseUrl = `${process.env.REACT_APP_API_URL}/api/Todos`;
 
-export const createTodo = async (todo: { title: string; completed: boolean }) => {
+export const createTodo = async (todo: { title: string; completed: boolean, deadline?: string | null | undefined}) => {
     return axios.post(baseUrl, {
         title: todo.title,
-        completed: todo.completed
+        completed: todo.completed,
+        deadline: todo.deadline
     }).then(response => response.data);
     }
 
@@ -32,7 +33,16 @@ export const editTodo = async (todo: Todo) => {
     return axios.put(`${baseUrl}`, {
         id: todo.id,
         title: todo.title,
-        completed: todo.completed
+        completed: todo.completed,
+        deadline: todo.deadline
+    }).then(response => response.data);
+}
+
+export const editTodoDeadline = async (id: number | undefined, deadline: string | null) => {
+    console.log("editTodoDeadline: " + id + " , " + deadline);
+    return axios.put(`${baseUrl}/deadline`, {
+        id,
+        deadline
     }).then(response => response.data);
 }
 
