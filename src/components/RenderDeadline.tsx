@@ -1,8 +1,9 @@
 import React from "react";
-import { DatePicker } from "antd";
+import { DatePicker, Row, Typography } from "antd";
 import dayjs from 'dayjs';
 import { changeTodoDeadline } from "../todoSlice";
 import utc from 'dayjs/plugin/utc';
+import DeadlineCountdown from "./DeadlineCountdown";
 
 dayjs.extend(utc);
 
@@ -24,8 +25,15 @@ const editable = isEditing({id: record.id});
             />
           </div>
         ) : (
-          <div className="deadline" >
-            {record.deadline !== null ? dayjs(record.deadline).utc(true).format("YYYY-MM-DD HH:mm") : "ingen deadline"}
+          <div className="deadline">
+            <Row>
+              {record.deadline !== null ? dayjs(record.deadline).utc(true).format("YYYY-MM-DD HH:mm") : "ingen deadline"}
+            </Row>
+            <Row>
+              <Typography.Text type="secondary">
+              <DeadlineCountdown deadline={dayjs(record.deadline).utc(true).format("YYYY-MM-DD HH:mm")} />
+              </Typography.Text>
+            </Row>
           </div>
         );
 

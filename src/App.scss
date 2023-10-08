@@ -2,6 +2,24 @@
     min-height: 100vh;
 }
 
+.layout {
+    display: flex;
+    flex-direction: column;
+    margin-top: 10vh;
+    opacity: 0.85;
+    margin-left: 2vb;
+    margin-right: 2vb;
+        background-image: repeating-linear-gradient(
+            45deg,
+            #fff 0%,
+            #5e94c7 100%,
+        );
+    animation: gradientAnimation 15s ease infinite;
+    background-size: 200% 200%;
+    clip-path: polygon(3% 4%, 95% 0, 100% 90%, 95% 100%, 0 97%);
+    padding : 2vh;
+}
+
 @keyframes gradientAnimation {
     0% {
         background-position: 0% 50%;
